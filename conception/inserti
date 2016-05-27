@@ -44,17 +44,14 @@ INSERT INTO VIP VALUES("14","RADCLIFFE","Daniel","M","1989-07-23","Londres","A",
 INSERT INTO VIP VALUES("15","LAMY","Alexandra","MME","1971-10-14","Alès","AR","FR","D");
 INSERT INTO VIP VALUES("16","DUJARDIN","Jean","M","1972-06-19","Rueil-Malmaison","AR","FR","D");
 INSERT INTO VIP VALUES("17","NEWELL","Mike","M","1942-03-28","St Albans","R","UK","M");
-INSERT INTO VIP VALUES("18","STEGERS","Bernice","MME","1942-03-28","St Albans","A","UK","M");
+INSERT INTO VIP VALUES(18, "BELL", "Kristen", "Mme", "1980-08-18", "Michigan", "Acteur", "US", "M");
 INSERT INTO VIP VALUES("19","SPIELBERG","Steven","M","1946-11-18","Ohio","R","US","M");
 INSERT INTO VIP VALUES("20","ASNER","Jules","MME","1968-02-14","Tempe","A","US","M");
 INSERT INTO VIP VALUES("22","MOORE","Demi","MME","1962-11-11","Roswell","AR","US","D");
 INSERT INTO VIP VALUES("21","BRANTLEY","Betsy","MME","1955-09-20","Rutherfordton","A","US","D");
 INSERT INTO VIP VALUES("23","BESSON","Luc","M","1959-03-18","Paris","R","FR","M");
-INSERT INTO VIP VALUES("24","IRVING","Amy","MME","1953-09-10","Palo Alto","A","US","M");
 INSERT INTO VIP VALUES("25","NOLAN","Christopher","M","1970-07-30","Londres","R","UK","M");
-INSERT INTO VIP VALUES("26","BLIER","Bertrand","M","1939-03-14","Paris","R","FR","M");
-INSERT INTO VIP VALUES("27","COOPER","Bradley","M","1975-01-05","Philadelphie","AR","UK","D");
-INSERT INTO VIP VALUES("28","ANDERS","Sean","M","1969-06-05","DeForest","AR","US","C");
+INSERT INTO VIP VALUES('26', 'HEARD', 'AMBER, '1986-04-22', 'Texas', 'Acteur', 'US', 'C');
 
 
 INSERT INTO PHOTO VALUES("1","P1",null,null);
