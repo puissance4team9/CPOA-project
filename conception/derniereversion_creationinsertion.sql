@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Client: localhost
--- Généré le: Mer 11 Mai 2016 à 15:02
+-- Généré le: Ven 03 Juin 2016 à 16:11
 -- Version du serveur: 5.1.73
 -- Version de PHP: 5.3.3
 
@@ -38,21 +38,23 @@ CREATE TABLE IF NOT EXISTS `CASTING` (
 --
 
 INSERT INTO `CASTING` (`numVip`, `numVisa`) VALUES
-(2, 1081380),
-(7, 1125520),
-(12, 1125520),
-(14, 1125520),
-(5, 1138980),
-(6, 1138980),
-(11, 1138980),
-(3, 1196320),
+(28, 1044220),
+(28, 1081380),
+(5, 1125520),
+(26, 1132830),
+(32, 1138980),
+(13, 1140280),
+(14, 1140280),
+(35, 1196320),
+(8, 1248710),
 (16, 1248710),
-(10, 1267180),
+(6, 1267180),
+(11, 1267180),
 (8, 1319610),
+(13, 1319610),
+(14, 1319610),
 (9, 1434270),
-(13, 1434270),
-(9, 1896230),
-(15, 1896230);
+(13, 1434270);
 
 -- --------------------------------------------------------
 
@@ -69,6 +71,48 @@ CREATE TABLE IF NOT EXISTS `EVENEMENT` (
   PRIMARY KEY (`numVip`,`dateMariage`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Déclencheurs `EVENEMENT`
+--
+DROP TRIGGER IF EXISTS `DIVORCE`;
+DELIMITER //
+CREATE TRIGGER `DIVORCE` AFTER UPDATE ON `EVENEMENT`
+ FOR EACH ROW BEGIN
+	
+	update VIP set codeStatut='Divorcé' WHERE numVip=NEW.numVip;
+	update VIP set codeStatut='Divorcé' WHERE  numVip=NEW.numVipConjoint;
+
+END
+//
+DELIMITER ;
+DROP TRIGGER IF EXISTS `Mariage`;
+DELIMITER //
+CREATE TRIGGER `Mariage` BEFORE INSERT ON `EVENEMENT`
+ FOR EACH ROW BEGIN 
+
+	declare cpt1 integer;
+	declare cpt2 integer;
+	declare msg varchar(255);
+    DECLARE EXIST_Mariage CONDITION FOR SQLSTATE '45003';
+
+	select count(*) into cpt1 from VIP
+	where numVip = NEW.numVip  and codeStatut<> 'Marié';
+	
+	select count(*) into cpt2 from VIP
+	where numVip=NEW.numVipConjoint  and codeStatut<> 'Marié';
+
+
+    if cpt1 <> 0 OR cpt2 <> 0 then 
+		CALL Deja_Mariage;
+    END IF;
+
+
+	update VIP set codeStatut='Marié' where numVip=NEW.numVip;
+	update VIP set codeStatut='Marié' where numVip=NEW.numVipConjoint;
+END
+//
+DELIMITER ;
+
 -- --------------------------------------------------------
 
 --
@@ -80,6 +124,7 @@ CREATE TABLE IF NOT EXISTS `FILM` (
   `titre` varchar(100) NOT NULL,
   `LibelleGenre` varchar(50) NOT NULL,
   `annee` int(11) NOT NULL,
+  `idPhotoF` varchar(20) NOT NULL,
   PRIMARY KEY (`numVisa`),
   KEY `LibelleGenre` (`LibelleGenre`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -88,19 +133,41 @@ CREATE TABLE IF NOT EXISTS `FILM` (
 -- Contenu de la table `FILM`
 --
 
-INSERT INTO `FILM` (`numVisa`, `titre`, `LibelleGenre`, `annee`) VALUES
-(1044220, ' Alice au pays des merveilles', 'Fantastique', 2010),
-(1081380, 'SWEENEY TODD, LE DIABOLIQUE BARBIER DE FLEET STREET', 'Fantastique', 2008),
-(1125520, 'Nos jours heureux', 'Comédie', 2006),
-(1132830, 'All the Boys Love Mandy Lane', 'Horreur', 2008),
-(1138980, 'Mission : Impossible III', 'Action', 2006),
-(1140280, 'Harry Potter et l''école des sorciers', 'Fantastique', 2001),
-(1196320, 'V pour Vendetta', 'Thriller', 2005),
-(1248710, 'Captain America : First Avenger', 'Science Fiction', 2011),
-(1267180, 'Hunger Games', 'Fantastique', 2012),
-(1319610, 'HARRY POTTER ET LA COUPE DE FEU', 'Fantastique', 2005),
-(1434270, 'Slumdog Millionaire', 'Action', 2008),
-(1896230, 'L''Orphelinat', 'Horreur', 2008);
+INSERT INTO `FILM` (`numVisa`, `titre`, `LibelleGenre`, `annee`, `idPhotoF`) VALUES
+(1044220, ' Alice au pays des merveilles', 'Fantastique', 2010, 'F1.jpg'),
+(1081380, 'SWEENEY TODD, LE DIABOLIQUE BARBIER DE FLEET STREET', 'Fantastique', 2008, 'F2.jpg'),
+(1125520, 'Nos jours heureux', 'Comédie', 2006, 'F3.jpg'),
+(1132830, 'All the Boys Love Mandy Lane', 'Horreur', 2008, 'F4.jpg'),
+(1138980, 'Mission : Impossible III', 'Action', 2006, 'F5.jpg'),
+(1140280, 'Harry Potter et l''école des sorciers', 'Fantastique', 2001, 'F6.jpg'),
+(1196320, 'V pour Vendetta', 'Thriller', 2005, 'F7.jpg'),
+(1248710, 'Captain America : First Avenger', 'Science Fiction', 2011, 'F8.jpg'),
+(1267180, 'Hunger Games', 'Fantastique', 2012, 'F9.jpg'),
+(1319610, 'HARRY POTTER ET LA COUPE DE FEU', 'Fantastique', 2005, 'F10.jpg'),
+(1434270, 'Slumdog Millionaire', 'Action', 2008, '11.jpg');
+
+--
+-- Déclencheurs `FILM`
+--
+DROP TRIGGER IF EXISTS `EXIST_FILM`;
+DELIMITER //
+CREATE TRIGGER `EXIST_FILM` BEFORE INSERT ON `FILM`
+ FOR EACH ROW BEGIN 
+
+	declare cpt integer;
+	declare msg varchar(255);
+    DECLARE EXIST_FILM CONDITION FOR SQLSTATE '45001';
+
+	select count(*) into cpt from FILM
+	where numVisa = NEW.numVisa and titre=NEW.titre and LibelleGenre=NEW.LibelleGenre and annee=NEW.annee;
+
+
+    if cpt <> 0 then 
+		CALL EXIST_FILM;
+    END IF; 
+END
+//
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -154,10 +221,10 @@ INSERT INTO `PAYS` (`nomPays`) VALUES
 
 CREATE TABLE IF NOT EXISTS `PHOTO` (
   `numVip` int(7) NOT NULL,
-  `photoId` int(7) NOT NULL,
+  `numeroSenquentId` int(7) NOT NULL,
   `date` date NOT NULL,
   `lieu` varchar(30) NOT NULL,
-  PRIMARY KEY (`numVip`,`photoId`)
+  PRIMARY KEY (`numVip`,`numeroSenquentId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -178,15 +245,31 @@ CREATE TABLE IF NOT EXISTS `REALISATEUR` (
 --
 
 INSERT INTO `REALISATEUR` (`numVip`, `numVisa`) VALUES
-(17, 1044220),
+(4, 1044220),
 (4, 1081380),
+(5, 1081380),
+(30, 1125520),
 (26, 1132830),
+(31, 1132830),
+(33, 1138980),
 (25, 1140280),
+(29, 1140280),
 (19, 1196320),
 (19, 1248710),
-(23, 1267180),
-(23, 1319610),
-(28, 1434270);
+(34, 1267180),
+(17, 1319610),
+(19, 1434270);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `UTILISATEUR`
+--
+
+CREATE TABLE IF NOT EXISTS `UTILISATEUR` (
+  `Login` varchar(30) NOT NULL,
+  `Password` int(30) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
 -- Contraintes pour les tables exportées
